@@ -85,7 +85,7 @@ jobs:
             docker pull jaaswanth07/todo-frontend-image:pr
             docker stop test-app || true
             docker rm test-app || true
-            docker run -d -p 4200:80 --name test-app jaaswanth07/todo-frontend-image:pr
+            docker run -d -p 4200:4200 --name test-app jaaswanth07/todo-frontend-image:pr
 
       # 9️⃣ Cleanup local container
       - name: Cleanup local test container
