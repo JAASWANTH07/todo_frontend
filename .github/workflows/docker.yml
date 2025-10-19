@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "Running test container..."
           docker run -d -p 4200:80 --name test-app jaaswanth07/todo-frontend-image:test
-          sleep 10
+          sleep 30
           docker ps
 
       # 6️ Verify that the app is running
