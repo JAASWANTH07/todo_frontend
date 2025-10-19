@@ -40,7 +40,7 @@ jobs:
       - name: Run container for testing
         run: |
           echo "Running test container..."
-          docker run -d -p 4200:80 --name test-app jaaswanth07/todo-frontend-image:test
+          docker run -d -p 4200:4200 --name test-app jaaswanth07/todo-frontend-image:test
           sleep 30
           docker ps
 
