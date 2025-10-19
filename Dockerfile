@@ -1,9 +1,15 @@
-FROM node:18  
-WORKDIR /app  
-COPY package*.json ./  
-RUN npm install  
-RUN npm install -g @angular/cli  
+FROM node:18
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
 COPY . .
-EXPOSE 4200  
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--disable-host-check"]
- 
+
+RUN npm install -g @angular/cli
+RUN ng build --prod
+
+# Use simple static server
+RUN npm install -g http-server
+
+EXPOSE 4200
+CMD ["http-server", "dist/angular-17-crud", "-p", "4200"]
