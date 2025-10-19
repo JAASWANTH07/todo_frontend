@@ -10,33 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️ Checkout source code
+      # 1️⃣ Checkout source code
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️ Set up Docker Buildx
+      # 2️⃣ Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3️ Login to DockerHub
+      # 3️⃣ Login to DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: jaaswanth07
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 4️ Build Docker image (but don't push yet)
+      # 4️⃣ Build Docker image (but don't push yet)
       - name: Build Docker Image
         id: docker_build
         uses: docker/build-push-action@v5
         with:
           push: false
-          load: true   
+          load: true
           tags: jaaswanth07/todo-frontend-image:test
           context: .
           file: ./Dockerfile
 
-      # 5️ Run test container
+      # 5️⃣ Run test container
       - name: Run container for testing
         run: |
           echo "Running test container..."
@@ -44,19 +44,26 @@ jobs:
           sleep 30
           docker ps
 
-      # 6️ Verify that the app is running
+      # 6️⃣ Verify that the app is running
       - name: Verify app response
         run: |
-          echo "Checking if app is responding..."
-          if curl -f http://localhost:4200 > /dev/null 2>&1; then
-            echo "App is running properly!"
-          else
-            echo "App failed to start."
+          echo "Waiting for Angular app to start..."
+          timeout=60
+          until curl -f http://localhost:4200 > /dev/null 2>&1 || [ $timeout -le 0 ]; do
+            echo "Waiting..."
+            sleep 2
+            timeout=$((timeout-2))
+          done
+
+          if [ $timeout -le 0 ]; then
+            echo " App failed to start."
             docker logs test-app
             exit 1
+          else
+            echo " App is running properly!"
           fi
 
-      # 7️ Push image to DockerHub (only if tests pass)
+      # 7️⃣ Push image to DockerHub (only if tests pass)
       - name: Push tested image to DockerHub
         if: success()
         uses: docker/build-push-action@v5
@@ -66,7 +73,7 @@ jobs:
           context: .
           file: ./Dockerfile
 
-      # 8️ Deploy to test server (optional — via SSH)
+      # 8️⃣ Deploy to test server (optional — via SSH)
       - name: Deploy to test server
         if: success()
         uses: appleboy/ssh-action@v1.1.0
@@ -80,7 +87,7 @@ jobs:
             docker rm test-app || true
             docker run -d -p 4200:80 --name test-app jaaswanth07/todo-frontend-image:pr
 
-      # 9️ Cleanup local container
+      # 9️⃣ Cleanup local container
       - name: Cleanup local test container
         if: always()
         run: docker rm -f test-app || true
